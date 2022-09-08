@@ -18,7 +18,6 @@ func main() {
 		} else if r.Method == "POST" {
 			uploadFile(w, r)
 		}
-		// fmt.Fprintf(w, "Upload")
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -29,7 +28,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20)
 
 	// Get handler for filename, size and headers
-	file, handler, err := r.FormFile("myFile")
+	file, handler, err := r.FormFile("file")
 	if err != nil {
 		fmt.Println("Error Retrieving the File")
 		fmt.Println(err)
@@ -43,11 +42,11 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 	// Create file
 	dst, err := os.Create("assets/" + handler.Filename)
-	defer dst.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer dst.Close()
 
 	// Copy the uploaded file to the created file on the filesystem
 	if _, err := io.Copy(dst, file); err != nil {
