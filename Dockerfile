@@ -8,7 +8,12 @@ RUN go mod download
 
 RUN go build -o main
 
-FROM mongo:5.0.12
+FROM alpine 
 
-COPY --from=build /app .
+WORKDIR /app
+
+COPY --from=build /app/public ./public
+COPY --from=build /app/main .
+
+ENTRYPOINT [ "./main" ]
 

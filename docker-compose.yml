@@ -1,0 +1,22 @@
+volumes:
+  file-volumes:
+
+services:
+  web:
+    build: .
+    ports:
+      - 8080:8080
+    volumes:
+      - "~/ilovehk/assets:/app/public/assets"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ilovehk
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - "~/ilovehk/assets-data:/data/db"
