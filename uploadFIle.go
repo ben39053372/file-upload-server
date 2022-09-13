@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -29,33 +30,37 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("File Size: %+v\n", handler.Size)
 	fmt.Printf("MIME Header: %+v\n", handler.Header)
 
-	// create folder
+	var assetsPath = "public/assets/" + time.Now().Format("2006-01-02")
 
+	// create folder
 	if _, err := os.Stat(assetsPath); errors.Is(err, os.ErrNotExist) {
 		// path/to/whatever does not exist
-		if err := os.Mkdir(assetsPath, os.ModePerm); err != nil {
+		if err := os.MkdirAll(assetsPath, os.ModePerm); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	id := primitive.NewObjectID()
+	// create empty doc for get id
+	id, err := CreateEmptyDoc()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fp := assetsPath + "/" + id.(primitive.ObjectID).Hex() + filepath.Ext(handler.Filename)
 
 	// Create file
-	dst, err := os.Create(assetsPath + "/" + id.String())
+	dst, err := os.Create(fp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
 
-	result := Insert(FilesData{
-		Id:        id,
-		Size:      handler.Size,
-		CreatedAt: time.Now(),
-	})
-	if result == nil {
-		http.Error(w, "data save error", http.StatusInternalServerError)
+	result, err := UpdateDoc(id, FilesData{Size: handler.Size, CreatedAt: time.Now(), Url: r.Host + "/assets/" + id.(primitive.ObjectID).Hex(), FilePath: fp})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -64,6 +69,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)

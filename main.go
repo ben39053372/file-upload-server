@@ -8,8 +8,6 @@ import (
 
 var indexPage = template.Must(template.ParseFiles("public/index.html"))
 
-var assetsPath = "public/assets"
-
 func main() {
 	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
