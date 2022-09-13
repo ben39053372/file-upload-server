@@ -2,7 +2,7 @@ volumes:
   file-volumes:
 
 services:
-  web:
+  file-server:
     build: .
     restart: always
     ports:
