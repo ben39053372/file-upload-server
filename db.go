@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -19,13 +17,6 @@ var collectionName = "assets"
 
 var collection *mongo.Collection
 
-type FilesData struct {
-	Size      int64     `bson:"size,omitempty"`
-	CreatedAt time.Time `bson:"createdAt,omitempty"`
-	FilePath  string    `bson:"filePath,omitempty"`
-	Url       string    `bson:"url,omitempty"`
-}
-
 func init() {
 
 	c, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
@@ -38,14 +29,6 @@ func init() {
 
 	collection = c.Database(database).Collection(collectionName)
 
-}
-
-func Insert(data FilesData) *mongo.InsertOneResult {
-	result, err := collection.InsertOne(context.TODO(), data)
-	if err != nil {
-		log.Panic(err)
-	}
-	return result
 }
 
 func CreateEmptyDoc() (interface{}, error) {
@@ -62,16 +45,21 @@ func UpdateDoc(id interface{}, data FilesData) (bson.M, error) {
 	var result bson.M
 	err := collection.FindOneAndUpdate(
 		context.Background(),
-		bson.D{{"_id", id}},
-		bson.D{{"$set", data}},
+		bson.D{{Key: "_id", Value: id}},
+		bson.D{{Key: "$set", Value: data}},
 		options.FindOneAndUpdate().SetReturnDocument(options.After),
 	).Decode(&result)
 	return result, err
 }
 
-func Get(id primitive.ObjectID) bson.M {
-	var result bson.M
-	collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
+func Get(id primitive.ObjectID) (FilesData, error) {
+	var result FilesData
+	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
 
-	return result
+	return result, err
+}
+
+func Del(id primitive.ObjectID) (*mongo.DeleteResult, error) {
+	result, err := collection.DeleteOne(context.TODO(), bson.D{{Key: "_id", Value: id}})
+	return result, err
 }

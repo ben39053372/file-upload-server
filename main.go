@@ -16,6 +16,12 @@ func main() {
 			uploadFile(w, r)
 		}
 	})
+
+	http.HandleFunc("/assets/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			getFile(w, r)
+		}
+	})
 	log.Default().Println("Server started")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
