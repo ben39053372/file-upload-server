@@ -9,7 +9,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - "~/ilovehk/assets:/app/public/assets"
+      - "/volume1/docker/ilovehk-volume/assets:/app/public/assets"
     depends_on:
       - mongo
     environment:
@@ -23,4 +23,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ilovehk
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
-      - "~/ilovehk/assets-data:/data/db"
+      - "/volume1/docker/ilovehk-volume/assets-data:/data/db"
