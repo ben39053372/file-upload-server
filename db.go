@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const uri = ""
+var uri = ""
 
 var database = "ben39053372/file-server"
 
@@ -19,10 +19,11 @@ var collectionName = "assets-data"
 var collection *mongo.Collection
 
 func init() {
-
-	if uri := os.Getenv("DB_URI"); uri == "" {
+	uri = os.Getenv("DB_URI")
+	if uri == "" {
 		panic("missing env: DB_URI")
 	}
+	print("uri:" + uri)
 
 	if database := os.Getenv("DB_NAME"); database == "" {
 		database = "file-server"
