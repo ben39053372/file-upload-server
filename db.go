@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -9,23 +10,33 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const uri = "mongodb://ilovehk:password@mongo:27017/?maxPoolSize=20"
+const uri = ""
 
-var database = "ilovehk-assets"
+var database = "ben39053372/file-server"
 
-var collectionName = "assets"
+var collectionName = "assets-data"
 
 var collection *mongo.Collection
 
 func init() {
+
+	if uri := os.Getenv("DB_URI"); uri == "" {
+		panic("missing env: DB_URI")
+	}
+
+	if database := os.Getenv("DB_NAME"); database == "" {
+		database = "file-server"
+	}
+
+	if collectionName := os.Getenv("DB_COLLECTION"); collectionName == "" {
+		collectionName = "assets-data"
+	}
 
 	c, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 
 	if err != nil {
 		panic(err)
 	}
-
-	// client = c
 
 	collection = c.Database(database).Collection(collectionName)
 
