@@ -25,11 +25,11 @@ func init() {
 	}
 	print("uri:" + uri)
 
-	if database := os.Getenv("DB_NAME"); database == "" {
+	if database = os.Getenv("DB_NAME"); database == "" {
 		database = "file-server"
 	}
 
-	if collectionName := os.Getenv("DB_COLLECTION"); collectionName == "" {
+	if collectionName = os.Getenv("DB_COLLECTION"); collectionName == "" {
 		collectionName = "assets-data"
 	}
 
