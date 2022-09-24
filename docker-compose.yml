@@ -1,18 +1,27 @@
 volumes:
   file-volumes:
 
+networks:
+  default:
+    name: proxy
+    external: true
+
 services:
   file-server:
     build: .
     image: ben39053372/file-server
     ports:
-      - 8080:8080
+      - 8081:8080
     volumes:
-      - "/volume1/docker/ilovehk-volume/assets:/app/public/assets"
+      - "~/volume1/docker/ilovehk-volume/assets:/app/public/assets"
     depends_on:
       - mongo
     environment:
       DB_URI: mongodb://ilovehk:password@mongo:27017/
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.file-server.rule=Host(`file.ilovehkshops.com`)"
+      - "traefik.http.services.file-server.loadbalancer.server.port=8080"
   mongo:
     image: mongo:4.4
     restart: always
@@ -22,4 +31,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ilovehk
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
-      - "/volume1/docker/ilovehk-volume/assets-data:/data/db"
+      - "~/volume1/docker/ilovehk-volume/assets-data:/data/db"
