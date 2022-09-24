@@ -13,7 +13,7 @@ services:
     ports:
       - 8081:8080
     volumes:
-      - "~/file-upload-server/assets:/app/public/assets"
+      - "./data/assets:/app/public/assets"
     depends_on:
       - mongo
     environment:
@@ -31,4 +31,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ilovehk
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
-      - "~/file-upload-server/assets/assets-data:/data/db"
+      - "./data/assets/assets-data:/data/db"
